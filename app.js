@@ -1,9 +1,7 @@
 var connect = require('connect'),
   cors = require('./middleware/cors'),
   homepage = require('./middleware/homepage'),
-  connection = require('./middleware/connection'),
-  downloader = require('./middleware/downloader'),
-  uploader = require('./middleware/uploader');
+  connection = require('./middleware/connection');
 
 
 /* Port which provided by BAE platform */
@@ -14,8 +12,6 @@ var app = connect()
     .use(homepage())
     .use(connection.dispatcher())
 //    .use(prepare())
-    .use(downloader())
-    .use(uploader())
     .use(connect.static(__dirname + '/public'))
     .use(function (req, res) {
       console.log('serving!' + req.url);
@@ -29,24 +25,4 @@ server.listen(port);
 
 io.sockets.on('connection', function (socket) {
   connection.manager(socket);
-
-  socket.on('request send', function(id){
-    global.request[id] = {};
-    socket.broadcast.emit('request get', id);
-  });
-  socket.on('readytodown', function(){
-    socket.broadcast.emit('reqest receive');
-  });
-  socket.on('set nickname', function (name) {
-    console.log(name);
-    socket.set('nickname', name, function () {
-      socket.emit('ready');
-    });
-  });
-
-  socket.on('msg', function () {
-    socket.get('nickname', function (err, name) {
-      console.log('Chat message by ', name);
-    });
-  });
 });
