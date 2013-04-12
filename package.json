@@ -1,0 +1,14 @@
+{
+  "name" : "transporter",
+  "version" : "0.0.1",
+  "private" : false,
+  "dependencies" : {
+    "connect" : "*",
+    "jade" : "*",
+    "less-middleware" : "*",
+    "async" : "*",
+    "socket.io" : "*"
+  },
+  "main": "app.js"
+}
+
