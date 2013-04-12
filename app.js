@@ -1,6 +1,7 @@
 var connect = require('connect'),
   cors = require('./middleware/cors'),
   homepage = require('./middleware/homepage'),
+  connection = require('./middleware/connection'),
   downloader = require('./middleware/downloader'),
   uploader = require('./middleware/uploader');
 
@@ -11,6 +12,7 @@ var port = process.env.APP_PORT || 3000;
 var app = connect()
     .use(cors())
     .use(homepage())
+    .use(connection.dispatcher())
 //    .use(prepare())
     .use(downloader())
     .use(uploader())
@@ -24,12 +26,10 @@ var io = require('socket.io').listen(server);
 
 server.listen(port);
 
-global.request = {};
+
 io.sockets.on('connection', function (socket) {
-//  socket.emit('news', { hello: 'world' });
-//  socket.on('my other event', function (data) {
-//    console.log(data);
-//  });
+  connection.manager(socket);
+
   socket.on('request send', function(id){
     global.request[id] = {};
     socket.broadcast.emit('request get', id);

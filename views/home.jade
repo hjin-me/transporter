@@ -1,34 +1,26 @@
 !!! 5
-//if lt IE 7
-  | <html lang="en" class="no-js ie6 oldie">
-//if IE 7
-  | <html lang="en" class="no-js ie7 oldie">
-//if IE 8
-  | <html lang="en" class="no-js ie8 oldie">
-// [if gt IE 8] <!
 html(class="no-js", lang="zh-CN")
-  // <![endif]
   head
     meta(charset="utf-8")
     meta(http-equiv="X-UA-Compatible", content="IE=edge,chrome=1")
     title 上传主页
     meta(name="description",content="")
     meta(name="author",content="HJin.me")
-    meta(name="description", content="??? HJin.me ????????????????")
+    meta(name="description", content="")
     meta(name="keywords",content="")
     meta(name="viewport",content="width=device-width, initial-scale=1.0")
-    meta(name="google-site-verification", content="3V7PwDBKWM8l1JrLHI7FnpS-90cOnyDUQTNHU0xQHiA")
-    link(href='/css/test.css', rel='stylesheet')
+    link(href='/css/normalize.css', ref='stylesheet')
+    link(href='/css/home.css', rel='stylesheet')
   // !Body
   body
-    #main
-      #div(style="width: 100%; height: 200px; border: 1px solid blue") Drop here
-      h1 Upload Your Images
-
-      form(method="post", enctype="multipart/form-data", action="http://localhost:3000/upload")
-        input#file(type="file", name="file", multiple)
-        button#btn(type="submit") Upload Files!
-      #response
-      ul#image-list
+    #background
+      .round5.circle
+      .round4.circle
+      .round3.circle
+      .round2.circle
+      .round1.circle
+      .me
+    #users
+      ul
     script(src='/socket.io/socket.io.js')
-    script(src='/js/test.js')
+    script(src='/js/home.js')

@@ -102,11 +102,28 @@ socket.on('request get', function(dd){
     location.href = '/download?id=' + dd;
   }, 300);
 });
+
+
+
 socket.on('connect', function(){
   ok = true;
 });
-socket.emit('set nickname', 'songsong');
-socket.on('news', function (data) {
-  console.log(data);
-  socket.emit('my other event', { my: 'data' });
+socket.on('set name', function(){
+  socket.emit('set name', getSystem() + "_" + parseInt(Math.random() * 10000));
 });
+socket.on('ready', function() {
+  socket.emit('get users');
+});
+socket.on('user list', function(users){
+  console.log(users);
+});
+
+function getSystem() {
+  var OSName="Unknown OS";
+  if (navigator.appVersion.indexOf("Win")!=-1) OSName="Windows";
+  if (navigator.appVersion.indexOf("Mac")!=-1) OSName="MacOS";
+  if (navigator.appVersion.indexOf("X11")!=-1) OSName="UNIX";
+  if (navigator.appVersion.indexOf("Linux")!=-1) OSName="Linux";
+
+  return OSName;
+}
