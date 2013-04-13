@@ -19,7 +19,6 @@ exports.dispatcher = function () {
     if (urlParsed.pathname === '/download') {
       trans_id = require('querystring').parse(require('url').parse(req.url).query).id;
       transport[trans_id].write = res;
-      next();
       return ;
     }
 
@@ -34,6 +33,7 @@ exports.dispatcher = function () {
 
       download_res.on('finish', function(){
         console.log('------------------ download end --------------------------');
+        delete transport[trans_id];
         res.write(JSON.stringify({err_no: 0}));
         res.end();
       });
@@ -73,8 +73,8 @@ exports.manager = function (socket) {
     socket.emit('user list', u);
   });
 
-  // 邀请某个用户进 room
 
+  // 请求发文件
   socket.on('request send', function (to) {
     var trans_id = socket.id + "_" + to + "_" + parseInt(Math.random() * 99999);
     transport[trans_id] = {};
@@ -84,6 +84,8 @@ exports.manager = function (socket) {
       socket.emit('error');
     }
   });
+
+  // 已经准备下载
   socket.on('readytodown', function (trans_id) {
     var from = trans_id.split("_")[0];
     if (from in clients) {

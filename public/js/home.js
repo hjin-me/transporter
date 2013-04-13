@@ -31,6 +31,7 @@
   });
 
 
+
   function getSystem() {
     var OSName="Unknown OS";
     if (navigator.appVersion.indexOf("Win")!=-1) OSName="Windows";
@@ -66,20 +67,60 @@
     xhr.send(file);
   }
 
-  function getPosition() {
-    var x = parseInt(Math.random() * 100),
-      y = parseInt(Math.random() * 100),
-      times = 5;
-    while( Math.pow(x-50, 2) / 200 + Math.pow(100 - y, 2)/600 < 1 && times -- > 0) {
-      x = parseInt(Math.random() * 100);
-      y = parseInt(Math.random() * 100);
+  var CirclePosition = function() {
+    this.currentAlpha = -27 + parseInt(Math.random() * 20 - 10);
+    this.step = 47;
+    this.start = 150;
+    this.dr = 0.5;
+    this.r = 100;
+    this.center = {
+      x : 400,
+      y : 500
     }
-    return {x: x, y: y};
+  };
+
+  CirclePosition.prototype.getPos = function() {
+    var alpha, rt, t, n, step = this.step;
+    do {
+      alpha = this.currentAlpha + 180;
+      rt = this.getR(alpha);
+      n = Math.floor(alpha / 360);
+      if( n > 1 ) {
+        step = (1 - this.dr * 360 * (n - 1) / rt) * this.step;
+      }
+      alpha += step;
+      this.currentAlpha += step;
+      t = alpha % 360;
+    }while(t > 170 || t < 10);
+    console.log(alpha, rt, step);
+    return {
+      x : this.getX(alpha) + parseInt(Math.random() * 20 - 10),
+      y : this.getY(alpha) + parseInt(Math.random() * 20 - 10)
+    }
+  };
+  CirclePosition.prototype.getR = function(alpha) {
+    alpha = alpha || this.currentAlpha;
+    return Math.pow(Math.pow(this.getX(alpha) - this.center.x, 2) + Math.pow(this.getY(alpha) - this.center.y, 2), 0.5);
+  };
+  CirclePosition.prototype.getX = function(alpha) {
+    alpha = alpha || this.currentAlpha;
+    return Math.cos(1/180 * alpha * Math.PI) * this.dr * alpha + this.center.x;
+  };
+  CirclePosition.prototype.getY = function(alpha) {
+    alpha = alpha || this.currentAlpha;
+    return - Math.sin(1/180 * alpha * Math.PI) * this.dr * alpha + this.center.y;
+  };
+
+
+  var pos = new CirclePosition();
+  function getPosition() {
+    return pos.getPos();
   }
 
   function renderUserList(users){
     function tpl(data) {
-      return '<div class="person circle user" style="left:' + data.left + '%;top:' + data.top + '%;" data-sid="' + data.sid+ '"></div>'
+      return '<div class="person circle user" style="left:' + data.left + 'px;top:' + data.top + 'px;" data-sid="' +
+        data.sid+ '" data-user="' + data.user + '"></div>'
     }
     var userContainer = document.querySelector('#users');
     var html = '';
@@ -90,24 +131,12 @@
       var p = getPosition();
       html += tpl({
         sid : i,
+        user : users[i],
         left : p.x,
         top : p.y
       });
     }
     userContainer.innerHTML = html;
-
-
-//    var ul = document.querySelector('#users ul');
-//    ul.innerHTML = '';
-//    for(var i in users) {
-//      if(!users.hasOwnProperty(i)) {
-//        continue;
-//      }
-//      var li = document.createElement('li');
-//      li.dataset.sid = i;
-//      li.innerHTML = '<span>' + users[i] + '</span>';
-//      ul.appendChild(li);
-//    }
   }
 
 
