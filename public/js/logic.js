@@ -38,6 +38,9 @@
   socket.on('reqest receive', function(trans_id) {
     uploadFile(toSend, trans_id);
   });
+  socket.on('error', function(err_no, err_message) {
+    alert(err_message);
+  });
 
 
 
@@ -71,7 +74,6 @@
       if (this.readyState != 4)
         return;
       console.log(this.responseText);
-      document.getElementById("response").innerHTML = 'SUCCESS';
     };
     xhr.send(file);
   }

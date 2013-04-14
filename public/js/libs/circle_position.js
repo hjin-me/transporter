@@ -6,6 +6,8 @@
 var CirclePosition = function (config) {
   config = config || {};
   this.currentAlpha = -27 + parseInt(Math.random() * 20 - 10);
+  this.currentLength = 1000 + parseInt(Math.random() * 100);
+  this.lengthStep = 360;
   this.step = 47;
   this.start = 150;
   this.dr = 0.5;
@@ -43,11 +45,11 @@ CirclePosition.prototype.isInBoundary = function (pos) {
  * @return bool
  */
 CirclePosition.prototype.isEnoughSpace = function () {
-  var rMax, alpha = this.currentAlpha, maxTimes = this.retry_times;
+  var rMax, alpha, length = this.currentLength, maxTimes = this.retry_times;
   rMax = Math.pow( Math.pow((this.boundary.x.max - this.boundary.x.min)/2, 2) +
     Math.pow((this.boundary.y.max - this.boundary.y.min)/2, 2), 0.5);
   for(var i = maxTimes; i > 0; i --) {
-    alpha = this.getRawPos(alpha).alpha;
+    alpha = this.getRawPos(length).alpha;
     if(this.getR(alpha) < rMax) {
       return true;
     }
@@ -57,30 +59,30 @@ CirclePosition.prototype.isEnoughSpace = function () {
 
 /**
  * 获取一个原始的座标，该座标不一定可用
- * @param {Number} [baseAlpha=false]
+ * @param {Number} [baseLength=false]
  * @returns {{x: number, y: number, alpha: number}}
  */
-CirclePosition.prototype.getRawPos = function(baseAlpha) {
-  baseAlpha = baseAlpha || false;
-  var alpha = (baseAlpha === false ? this.currentAlpha : baseAlpha ) + 180;
-  var rt = this.getR(alpha);
-  var n = Math.floor(alpha / 360);
-  var step = this.step;
-  if (n > 1) {
-    step = (1 - this.dr * 360 * (n - 1) / rt) * this.step;
-  }
-  alpha += step;
-  if(baseAlpha === false) {
-    this.currentAlpha += step;
+CirclePosition.prototype.getRawPos = function(baseLength) {
+  baseLength = baseLength || false;
+  var length = (baseLength === false ? this.currentLength : baseLength );
+
+  var a; // 可以旋转的角度
+
+  // a = Math.pow( 540 * (length + this.lengthStep) / this.dr / Math.PI, 1/3);
+  a = Math.pow((180*(length + this.lengthStep)/Math.PI/this.dr + 1), 1/2);
+
+  if(baseLength === false) {
+    this.currentLength += this.lengthStep;
   }
   var ret = {
-    x : this.getX(alpha),
-    y : this.getY(alpha),
-    alpha : alpha
+    x : this.getX(a),
+    y : this.getY(a),
+    alpha : a
   };
   console.log('-- getRawPos --');
   console.log(ret);
   return ret;
+
 };
 /**
  * 获取一个新的可用点座标，并加上随机误差

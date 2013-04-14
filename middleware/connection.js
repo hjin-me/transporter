@@ -17,29 +17,68 @@ exports.dispatcher = function () {
 
     var trans_id;
     if (urlParsed.pathname === '/download') {
+      console.log('----- start download ----');
       trans_id = require('querystring').parse(require('url').parse(req.url).query).id;
+      console.log(trans_id);
       transport[trans_id].write = res;
       return ;
     }
 
     if (urlParsed.pathname == '/upload') {
+      console.log('----- start upload ----');
       var query = require('querystring').parse(require('url').parse(req.url).query),
         type = query['type'],
         filename = query['filename'];
       trans_id = query['id'] || '';
-      var download_res = transport[trans_id].write;
-      download_res.setHeader('Content-type', type);
-      download_res.setHeader('Content-Disposition', "attachment;filename=" + filename);
+      console.log(query);
 
-      download_res.on('finish', function(){
-        console.log('------------------ download end --------------------------');
-        delete transport[trans_id];
-        res.write(JSON.stringify({err_no: 0}));
-        res.end();
+      process.nextTick(function(){
+        sendFile();
       });
 
-      console.log("-----------start transfer -------------");
-      req.pipe(download_res);
+      function sendFile(times) {
+        times = times || 0;
+        times ++;
+        console.log(times);
+        if(times > 3) {
+          // lost connection
+          console.log('retry too many times');
+          req.on('data', function(){
+
+          });
+          req.on('end', function(){
+            res.write(JSON.stringify({err_no: 404}));
+            res.end();
+          });
+
+          try{
+            transport[trans_id].write.end();
+          }catch(e){
+            console.log('connect lost')
+          }
+
+          return ;
+        }
+        if(!(trans_id in transport) || !transport[trans_id].write) {
+          process.nextTick(function(){
+            sendFile(times)
+          });
+          return ;
+        }
+        var download_res = transport[trans_id].write;
+        download_res.setHeader('Content-type', type);
+        download_res.setHeader('Content-Disposition', "attachment;filename=" + filename);
+
+        download_res.on('finish', function(){
+          console.log('------------------ download end --------------------------');
+          delete transport[trans_id];
+          res.write(JSON.stringify({err_no: 0}));
+          res.end();
+        });
+
+        console.log("-----------start transfer -------------");
+        req.pipe(download_res);
+      }
       return ;
     }
 
@@ -76,22 +115,22 @@ exports.manager = function (socket) {
 
   // 请求发文件
   socket.on('request send', function (to) {
-    var trans_id = socket.id + "_" + to + "_" + parseInt(Math.random() * 99999);
+    var trans_id = socket.id + "|" + to + "|" + parseInt(Math.random() * 99999);
     transport[trans_id] = {};
     if (to in clients) {
       clients[to].emit('request get', trans_id);
     } else {
-      socket.emit('error');
+      socket.emit('error', 404, 'user is disconnected');
     }
   });
 
   // 已经准备下载
   socket.on('readytodown', function (trans_id) {
-    var from = trans_id.split("_")[0];
+    var from = trans_id.split("|")[0];
     if (from in clients) {
       clients[from].emit('reqest receive', trans_id);
     } else {
-      socket.emit('error');
+      socket.emit('error', 404, 'user is disconnected');
     }
   });
 };

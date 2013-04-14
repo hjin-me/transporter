@@ -34,7 +34,7 @@ UserList.prototype.add = function(user) {
 };
 UserList.prototype.buildUserList = function() {
 
-}
+};
 /**
  * 渲染一组用户
  * @param {{after : String, before : String}} [config]
@@ -62,14 +62,14 @@ UserList.prototype.render = function(config) {
 
   first = uidArr[0];
   for(var i = 0; i < uidArr.length; i ++) {
-    var p = this.cp.getPos();
+    var p = this.cp.getPos(60);
     if(!p) {
       // 没有足够空间来插入新的元素了
       break;
     }
     last = uidArr[i];
     html += tpl({
-      sid : i,
+      sid : uidArr[i],
       user : this.users[uidArr[i]],
       left : p.x,
       top : p.y
