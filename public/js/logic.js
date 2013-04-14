@@ -38,6 +38,11 @@
   socket.on('reqest receive', function(trans_id) {
     uploadFile(toSend, trans_id);
   });
+  socket.on('new client', function(user) {
+    var u = {};
+    u[user.id] = user.name;
+    user_manager.add(u);
+  });
   socket.on('error', function(err_no, err_message) {
     alert(err_message);
   });

@@ -102,6 +102,7 @@ exports.manager = function (socket) {
     socket.set('nickname', name, function () {
       socket.emit('ready');
       users[socket.id] = name;
+      socket.broadcast.emit('new client', {id : socket.id, name : name});
     });
   });
 
