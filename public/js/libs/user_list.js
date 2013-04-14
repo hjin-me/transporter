@@ -6,11 +6,20 @@ var UserList = function(config) {
     x : this.container.offsetWidth / 2 + 30,
     y : this.container.offsetHeight
   });
-
 };
 
 UserList.prototype.reload = function() {
 
+};
+UserList.prototype.import = function(userlist) {
+  for(var i in userlist) {
+    if(userlist.hasOwnProperty(i)) {
+      this.add({
+        id : i,
+        name : userlist[i]
+      })
+    }
+  }
 };
 UserList.prototype.add = function(user) {
   this.users[user.id] = user.name;
