@@ -8,6 +8,7 @@
 (function(){
   var ok = false;
   var socket = io.connect();
+  var user_manager = new UserList();
   socket.on('connect', function(){
     ok = true;
   });
@@ -26,17 +27,9 @@
   socket.on('user list', function(users){
     console.log(users);
     delete users[socket.id];
-    var u = new UserList();
-    for(var i in users) {
-      if(users.hasOwnProperty(i)) {
-        u.add({
-          id : i,
-          name : users[i]
-        })
-      }
-    }
-    u.render();
-    u.show();
+    user_manager.import(users);
+    user_manager.render();
+    user_manager.show();
   });
   socket.on('request get', function(trans_id){
     location.href = '/download?id=' + trans_id;

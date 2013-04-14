@@ -107,9 +107,9 @@
     position: fixed;
     top:0;
     left: 50%;
-    margin-left: -35%;
+    margin-left: -45%;
     height: 75%;
-    width: 70%;
+    width: 90%;
 }
 #users ul {
     margin: 0;
