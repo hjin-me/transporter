@@ -8,7 +8,6 @@ var CirclePosition = function (config) {
   this.currentAlpha = -27 + parseInt(Math.random() * 20 - 10);
   this.currentLength = 1000 + parseInt(Math.random() * 100);
   this.lengthStep = 360;
-  this.step = 47;
   this.start = 150;
   this.dr = 0.5;
   this.r = 100;

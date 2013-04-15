@@ -91,7 +91,7 @@ function prepareTranslate(file) {
 }
 var ok = false;
 var socket = io.connect();
-socket.on('reqest receive', function() {
+socket.on('request receive', function() {
   alert('go?');
   uploadFile(toSend, id);
 });

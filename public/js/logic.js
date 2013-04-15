@@ -9,6 +9,7 @@
   var ok = false;
   var socket = io.connect();
   var user_manager = new UserList();
+  var mBox = new MessageBox();
   socket.on('connect', function(){
     ok = true;
   });
@@ -32,10 +33,18 @@
     user_manager.show();
   });
   socket.on('request get', function(trans_id){
-    location.href = '/download?id=' + trans_id;
-    socket.emit('readytodown', trans_id);
+    mBox.confirm('某某人给你发这个文件，是否接受？', '请确认', function() {
+      window.open('/download?id=' + trans_id);
+      this.close();
+    }, function() {
+      socket.emit('request refuse', trans_id);
+      this.close();
+    });
   });
-  socket.on('reqest receive', function(trans_id) {
+  socket.on('request refused', function(trans_id) {
+    mBox.alert('对方拒绝了你的文件', '提示');
+  });
+  socket.on('request receive', function(trans_id) {
     uploadFile(toSend, trans_id);
   });
   socket.on('new client', function(user) {

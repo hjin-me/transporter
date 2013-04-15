@@ -123,6 +123,102 @@
     padding: 5px 8px 7px;
 }
 
+.message_box {
+    width: 30%;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    margin-left: -15%;
+    margin-top: -50px;
+    background: #ffffff;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0,0,0, 0.5);
+    overflow: hidden;
+}
+.message_box header {
+    background-color: #cccccc;
+    box-shadow: 0 12px 10px rgba(255,255,255,0.4) inset, 0 1px 2px rgba(0,0,0, 0.5);
+}
+.message_box header h3 {
+    margin: 0;
+    padding: 5px 10px 6px;
+}
+.message_box section {
+    margin-top: 10px;
+    min-height: 3em;
+    max-height: 36vh;
+    overflow: auto;
+}
+.message_box p {
+    text-align: center;
+}
+.message_box footer {
+    position: relative;
+    text-align: center;
+    padding-bottom: 1.2em;
+}
+.message_box button {
+    display: inline-block;
+    vertical-align: middle;
+    font-size: 12px;
+    border-radius: 5px;
+
+    display: inline-block;
+    padding: 0 16px;
+
+    cursor: pointer;
+    outline: none;
+    height: 26px;
+    line-height: 26px;
+}
+.message_box button.confirm {
+    -webkit-box-shadow: inset 1px 1px 0 0 rgba(255, 255, 255, 0.25);
+    box-shadow: inset 1px 1px 0 0 rgba(255, 255, 255, 0.25);
+    border: 1px solid rgb(19, 98, 174);
+    background: rgb(72, 156, 243);
+    background: -moz-linear-gradient(top,rgba(72, 156, 243, 1) 0,rgba(26, 110, 197, 1) 100%);
+    background: -webkit-gradient(linear,left top,left bottom,color-stop(0%,rgba(72, 156, 243, 1)),color-stop(100%,rgba(26, 110, 197, 1)));
+    background: -webkit-linear-gradient(top,rgba(72, 156, 243, 1) 0,rgba(26, 110, 197, 1) 100%);
+    background: -o-linear-gradient(top,rgba(72, 156, 243, 1) 0,rgba(26, 110, 197, 1) 100%);
+    background: -ms-linear-gradient(top,rgba(72, 156, 243, 1) 0,rgba(26, 110, 197, 1) 100%);
+    background: linear-gradient(to bottom,rgba(72, 156, 243, 1) 0,rgba(26, 110, 197, 1) 100%);
+
+    color: rgb(255, 255, 255);
+}
+.message_box button.confirm:hover {
+    background: rgb(102, 169, 239);
+    background: -moz-linear-gradient(top,rgba(102, 169, 239, 1) 0,rgba(28, 95, 165, 1) 100%);
+    background: -webkit-gradient(linear,left top,left bottom,color-stop(0%,rgba(102, 169, 239, 1)),color-stop(100%,rgba(28, 95, 165, 1)));
+    background: -webkit-linear-gradient(top,rgba(102, 169, 239, 1) 0,rgba(28, 95, 165, 1) 100%);
+    background: -o-linear-gradient(top,rgba(102, 169, 239, 1) 0,rgba(28, 95, 165, 1) 100%);
+    background: -ms-linear-gradient(top,rgba(102, 169, 239, 1) 0,rgba(28, 95, 165, 1) 100%);
+    background: linear-gradient(to bottom,rgba(102, 169, 239, 1) 0,rgba(28, 95, 165, 1) 100%);
+}
+.message_box button.refuse {
+    -webkit-box-shadow: inset 0 2px 0 0 rgba(255, 255, 255, 1);
+    box-shadow: inset 0 2px 0 0 rgba(255, 255, 255, 1);
+    border: 1px solid rgb(153, 153, 153);
+    background: rgb(245, 246, 246);
+    background: -moz-linear-gradient(top,rgba(245, 246, 246, 1) 0,rgba(223, 223, 222, 1) 100%);
+    background: -webkit-gradient(linear,left top,left bottom,color-stop(0%,rgba(245, 246, 246, 1)),color-stop(100%,rgba(223, 223, 222, 1)));
+    background: -webkit-linear-gradient(top,rgba(245, 246, 246, 1) 0,rgba(223, 223, 222, 1) 100%);
+    background: -o-linear-gradient(top,rgba(245, 246, 246, 1) 0,rgba(223, 223, 222, 1) 100%);
+    background: -ms-linear-gradient(top,rgba(245, 246, 246, 1) 0,rgba(223, 223, 222, 1) 100%);
+    background: linear-gradient(to bottom,rgba(245, 246, 246, 1) 0,rgba(223, 223, 222, 1) 100%);
+
+    color: rgb(91, 91, 91);
+}
+.message_box button.refuse:hover {
+    box-shadow: none;
+    background: rgb(223, 223, 222);
+    background: -moz-linear-gradient(top,rgba(223, 223, 222, 1) 0,rgba(245, 246, 246, 1) 100%);
+    background: -webkit-gradient(linear,left top,left bottom,color-stop(0%,rgba(223, 223, 222, 1)),color-stop(100%,rgba(245, 246, 246, 1)));
+    background: -webkit-linear-gradient(top,rgba(223, 223, 222, 1) 0,rgba(245, 246, 246, 1) 100%);
+    background: -o-linear-gradient(top,rgba(223, 223, 222, 1) 0,rgba(245, 246, 246, 1) 100%);
+    background: -ms-linear-gradient(top,rgba(223, 223, 222, 1) 0,rgba(245, 246, 246, 1) 100%);
+    background: linear-gradient(to bottom,rgba(223, 223, 222, 1) 0,rgba(245, 246, 246, 1) 100%);
+}
+
 @media screen and (-webkit-min-device-pixel-ratio: 2) {
     #background {
         background-image: url(../img/fabric_of_squares_gray/fabric_of_squares_gray_@2X.png) ;

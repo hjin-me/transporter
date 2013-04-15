@@ -21,6 +21,14 @@ exports.dispatcher = function () {
       trans_id = require('querystring').parse(require('url').parse(req.url).query).id;
       console.log(trans_id);
       transport[trans_id].write = res;
+
+      var from = trans_id.split("|")[0];
+      if (from in clients) {
+        clients[from].emit('request receive', trans_id);
+      } else {
+        socket.emit('error', 404, 'user is disconnected');
+      }
+
       return ;
     }
 
@@ -125,11 +133,11 @@ exports.manager = function (socket) {
     }
   });
 
-  // 已经准备下载
-  socket.on('readytodown', function (trans_id) {
+  // 拒绝下载该文件
+  socket.on('request refuse', function(trans_id) {
     var from = trans_id.split("|")[0];
     if (from in clients) {
-      clients[from].emit('reqest receive', trans_id);
+      clients[from].emit('request refused', trans_id);
     } else {
       socket.emit('error', 404, 'user is disconnected');
     }

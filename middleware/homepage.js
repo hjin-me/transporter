@@ -9,7 +9,6 @@ module.exports = function(){
   return function homepage(req, res, next) {
     console.log("----- start home page ----");
     var urlParsed = require('url').parse(req.url);
-    console.log(urlParsed);
     if(urlParsed.pathname != '/') {
       next();
       return ;
