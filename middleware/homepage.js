@@ -19,9 +19,13 @@ module.exports = function(){
 
     // Compile a function
     if(!tpl) {
-      tpl = jade.compile(fs.readFileSync(__dirname + '/../views/home.jade', 'utf8'));
+      tpl = jade.compile(fs.readFileSync(__dirname + '/../views/home.jade', 'utf8'), {
+        self : true
+      });
     }
-    res.write(tpl());
+    res.write(tpl({
+      title : '文件上传咯'
+    }));
     res.end();
 
     console.log('ended by homepage');

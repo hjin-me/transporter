@@ -109,8 +109,13 @@ exports.manager = function (socket) {
     console.log(name);
     socket.set('nickname', name, function () {
       socket.emit('ready');
-      users[socket.id] = name;
-      socket.broadcast.emit('new client', {id : socket.id, name : name});
+      users[socket.id] = {
+        name : name,
+        sid : socket.id,
+        uid : socket.id,
+        headurl : ''
+      };
+      socket.broadcast.emit('new client', users[socket.id]);
     });
   });
 
@@ -118,6 +123,7 @@ exports.manager = function (socket) {
   socket.on('get users', function () {
     var u = JSON.parse(JSON.stringify(users));
     delete u[socket.id];
+    console.log(u);
     socket.emit('user list', u);
   });
 

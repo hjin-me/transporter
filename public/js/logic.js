@@ -8,7 +8,6 @@
 (function(){
   var ok = false;
   var socket = io.connect();
-  var user_manager = new UserList();
   var mBox = new MessageBox();
   socket.on('connect', function(){
     ok = true;
@@ -27,10 +26,25 @@
   });
   socket.on('user list', function(users){
     console.log(users);
-    delete users[socket.id];
-    user_manager.import(users);
-    user_manager.render();
-    user_manager.show();
+    var u, p;
+    for(var i in users) {
+      if(!users.hasOwnProperty(i)){
+        continue;
+      }
+      p = {};
+      for(var j in users[i]) {
+        if(!users[i].hasOwnProperty(j)){
+          continue;
+        }
+        p[j] = {value : users[i][j]}
+      }
+      u = Object.create(User, {
+        _private : {
+          value : Object.create(UserProfile, p)
+        }
+      });
+      UserManager.addUser(u);
+    }
   });
   socket.on('request get', function(trans_id){
     mBox.confirm('某某人给你发这个文件，是否接受？', '请确认', function() {
@@ -48,9 +62,19 @@
     uploadFile(toSend, trans_id);
   });
   socket.on('new client', function(user) {
-    var u = {};
-    u[user.id] = user.name;
-    user_manager.add(u);
+    var p = {};
+    for(var i in user) {
+      if(!user.hasOwnProperty(i)){
+        continue;
+      }
+      p[i] = {value : user[i]}
+    }
+    var u = Object.create(User, {
+      _private : {
+        value : Object.create(UserProfile, p)
+      }
+    });
+    UserManager.addUser(u);
   });
   socket.on('error', function(err_no, err_message) {
     alert(err_message);
