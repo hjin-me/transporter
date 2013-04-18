@@ -95,12 +95,13 @@ exports.dispatcher = function () {
   }
 };
 
-exports.manager = function (socket) {
+exports.manager = function (socket, all) {
   // 保存连接
   clients[socket.id] = socket;
   socket.on('disconnect', function () {
     delete clients[socket.id];
     delete users[socket.id];
+    all.emit('client leave', socket.id);
   });
 
   // 设置用户信息

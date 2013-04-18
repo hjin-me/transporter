@@ -25,5 +25,5 @@ server.listen(port);
 
 
 io.sockets.on('connection', function (socket) {
-  connection.manager(socket);
+  connection.manager(socket, io.sockets);
 });

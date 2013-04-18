@@ -80,6 +80,10 @@
     alert(err_message);
   });
 
+  socket.on('client leave', function(sid) {
+    UserManager.removeUser(sid);
+  });
+
 
 
   function getSystem() {

@@ -52,11 +52,19 @@
     }
   };
   UserManager.prototype.removeUser = function(user) {
-    var res, uid = '';
+    var res, uid = '', sid;
     if(typeof user == 'string') {
-      uid = user
+      sid = user;
+      for(var i in this.userList) {
+        if(!this.userList.hasOwnProperty(i)) {
+          continue;
+        }
+        if(this.userList[i].sid == sid) {
+          uid = this.userList[i].uid;
+        }
+      }
     }
-    if(user instanceof User) {
+    if(typeof user == 'object') {
       uid = user.uid;
     }
     this._trigger(this._EVENT_BEFORE_REMOVEUSER, this.userList[uid]);

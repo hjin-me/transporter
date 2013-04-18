@@ -154,7 +154,7 @@
       value: function () {
         this._trigger(this._EVENT_BEFORE_SHOW);
         var clsn = " " + this._private.dom.className.trim() + " ";
-        clsn = clsn.replace(/ hide /g, ' ').trim();
+        clsn = clsn.replace(/ hide(?=\s)/g, '').trim();
         clsn = clsn.split(' ');
         clsn.push('show');
         this._private.dom.className = clsn.join(' ');
@@ -165,7 +165,7 @@
       value: function () {
         this._trigger(this._EVENT_BEFORE_HIDE);
         var clsn = " " + this._private.dom.className.trim() + " ";
-        clsn = clsn.replace(/ show /g, ' ').trim();
+        clsn = clsn.replace(/ show(?=\s)/g, '').trim();
         clsn = clsn.split(' ');
         clsn.push('hide');
         this._private.dom.className = clsn.join(' ');
