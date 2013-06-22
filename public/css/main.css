@@ -1,0 +1,30 @@
+#container {
+    padding-left: 150px;
+}
+#info {
+    margin-left: -150px;
+    width: 150px;
+    position: fixed;
+    top: 0;
+    left: 150px;
+    bottom: 0;
+    z-index: 1000;
+    background: rgb(25, 24, 24);
+    overflow-y: auto;
+    -webkit-overflow-scroll: touch;
+    color:#fff;
+}
+.edit {
+    cursor: pointer;
+}
+.client {
+    margin: 30px;
+}
+
+#download {
+    width: 0;
+    height: 0;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+}

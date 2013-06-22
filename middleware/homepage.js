@@ -7,12 +7,12 @@
 module.exports = function(){
   var tpl;
   return function homepage(req, res, next) {
-    console.log("----- start home page ----");
     var urlParsed = require('url').parse(req.url);
     if(urlParsed.pathname != '/') {
       next();
       return ;
     }
+    console.log("----- start home page ----");
 
     var jade = require('jade');
     var fs = require('fs');

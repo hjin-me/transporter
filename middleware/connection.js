@@ -12,7 +12,7 @@ var transport = {};
 
 exports.dispatcher = function () {
   return function (req, res, next) {
-
+    req.pause();
     var urlParsed = require('url').parse(req.url);
 
     var trans_id;
@@ -20,11 +20,15 @@ exports.dispatcher = function () {
       console.log('----- start download ----');
       trans_id = require('querystring').parse(require('url').parse(req.url).query).id;
       console.log(trans_id);
+      if(!transport[trans_id]) {
+        transport[trans_id] = {};
+      }
       transport[trans_id].write = res;
 
-      var from = trans_id.split("|")[0];
+      var t = trans_id.split('|');
+      var from = t[0];
       if (from in clients) {
-        clients[from].emit('request receive', trans_id);
+        clients[from].emit('transport ready', trans_id);
       } else {
         socket.emit('error', 404, 'user is disconnected');
       }
@@ -86,6 +90,7 @@ exports.dispatcher = function () {
 
         console.log("-----------start transfer -------------");
         req.pipe(download_res);
+        req.resume();
       }
       return ;
     }
@@ -101,22 +106,29 @@ exports.manager = function (socket, all) {
   socket.on('disconnect', function () {
     delete clients[socket.id];
     delete users[socket.id];
-    all.emit('client leave', socket.id);
+    all.emit('user leave', socket.id);
   });
 
   // 设置用户信息
-  socket.emit('set name');
-  socket.on('set name', function (name) {
-    console.log(name);
-    socket.set('nickname', name, function () {
+  socket.emit('get name');
+  socket.on('set name', function (user) {
+    console.log(user);
+    socket.set('nickname', user.name, function () {
       socket.emit('ready');
       users[socket.id] = {
-        name : name,
+        name : user.name,
         sid : socket.id,
         uid : socket.id,
         headurl : ''
       };
-      socket.broadcast.emit('new client', users[socket.id]);
+      socket.broadcast.emit('user enter', users[socket.id]);
+    });
+  });
+
+  socket.on('rename', function(user) {
+    socket.set('nickname', user.name, function(){
+      users[socket.id].name = user.name;
+      socket.broadcast.emit('user rename', socket.id, user.name);
     });
   });
 
@@ -128,13 +140,31 @@ exports.manager = function (socket, all) {
     socket.emit('user list', u);
   });
 
-
+  socket.on('transport request', function(tid) {
+    var to = tid.split('|')[0];
+    var trans_id = socket.id + "|" + tid + "|" + parseInt(Math.random() * 99999);
+    transport[trans_id] = {};
+    if (to in clients) {
+      clients[to].emit('transport request', trans_id);
+    } else {
+      socket.emit('error', 404, 'user is disconnected');
+    }
+    // socket.emit('file get', tid);
+  });
+  socket.on('transport ready', function(trans_id) {
+    var t = trans_id.split("|"), from = t[0], tid = t[1] + '|' + t[2];
+    if (from in clients) {
+      clients[from].emit('transport ready', tid);
+    } else {
+      socket.emit('error', 404, 'user is disconnected');
+    }
+  });
   // 请求发文件
   socket.on('request send', function (to) {
     var trans_id = socket.id + "|" + to + "|" + parseInt(Math.random() * 99999);
     transport[trans_id] = {};
     if (to in clients) {
-      clients[to].emit('request get', trans_id);
+      clients[to].emit('request send', trans_id);
     } else {
       socket.emit('error', 404, 'user is disconnected');
     }
