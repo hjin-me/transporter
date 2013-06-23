@@ -48,7 +48,7 @@ app.directive('dropupload', function() {
   return {
     restrict: 'A',
     link: function (scope, elem) {
-      var ddcounter = 0
+      var ddcounter = 0;
       elem.bind('dragenter', function(e){
         e.preventDefault();
         ddcounter ++;
@@ -127,7 +127,38 @@ app.factory('User', function() {
 });
 
 app.factory('Client', function() {
-  return [];
+  var Client = function() {
+    this.clients = [];
+  };
+  Client.prototype.indexOf = function(client) {
+    for(var i = 0, n = this.clients.length; i < n; i ++) {
+      if(this.clients[i].sid == client.sid) {
+        return i;
+      }
+    }
+    return -1;
+  };
+  Client.prototype.add = function(client) {
+    var pos = this.indexOf(client);
+    if(pos > -1) {
+      this.clients.splice(pos, 1, [client]);
+    } else {
+      this.clients.push(client);
+    }
+  };
+  Client.prototype.remove = function(client) {
+    var pos = this.indexOf(client);
+    if(pos > -1) {
+      this.clients.splice(pos, 1);
+    }
+  };
+  Client.prototype.clear = function() {
+    this.clients.length = 0;
+  };
+  Client.prototype.get = function() {
+    return this.clients;
+  };
+  return new Client();
 });
 
 app.run(function(socket, User){
@@ -157,7 +188,7 @@ app.controller('UploadCtrl', function($scope, socket, TaskQueue){
       if($scope.queues[i].tid == tid) {
         $scope.queues[i].status = 'cancel';
         $scope.queues[i].progress = 100;
-        $scope.queues[i].xhr.abort();
+        $scope.queues[i].xhr && $scope.queues[i].xhr.abort();
         return ;
       }
     }
@@ -237,30 +268,51 @@ app.controller('InfoCtrl', function($scope, socket, User){
   }
 });
 app.controller('ClientsCtrl', function($scope, socket, Client){
-  $scope.clients = Client;
+  $scope.clients = Client.get();
+  $scope.dialog = {
+    show : false,
+    name : '',
+    sid : '',
+    message : ''
+  };
+  $scope.alert = {
+    show : false,
+    message : ''
+  };
 
-  socket.on('connect', function () {
-    $scope.clients = Client;
-  });
+  $scope.showDialog = function(name, sid) {
+    $scope.dialog.name = name;
+    $scope.dialog.sid = sid;
+    $scope.dialog.show = true;
+  };
+
+  $scope.hideDialog = function() {
+    $scope.dialog.show = false;
+  };
+
+  $scope.sendMessage = function() {
+    socket.emit('message:send', {
+      sid : $scope.dialog.sid,
+      message : $scope.dialog.message
+    });
+    $scope.dialog.message = '';
+    $scope.hideDialog();
+  };
 
   socket.on('user list', function(clients) {
+    Client.clear();
     for(var i in clients) {
       if(clients.hasOwnProperty(i)) {
-        $scope.clients.push(clients[i]);
+        Client.add(clients[i]);
       }
     }
   });
   socket.on('user leave', function(sid) {
-    for(var i = 0, n = $scope.clients.length; i < n; i ++) {
-      if($scope.clients[i].sid == sid) {
-        $scope.clients.splice(i, 1);
-        return ;
-      }
-    }
+    Client.remove({sid: sid});
   });
 
   socket.on('user enter', function(client) {
-    $scope.clients.push(client);
+    Client.add(client);
   });
 
   socket.on('user rename', function(sid, name) {
@@ -270,6 +322,21 @@ app.controller('ClientsCtrl', function($scope, socket, Client){
         return ;
       }
     }
+  });
+
+  socket.on('message:receive', function(data){
+    var user;
+    console.log(Client.get());
+    console.log(data);
+    for(var i = 0, n = $scope.clients.length; i < n; i ++) {
+      if($scope.clients[i].sid == data.sid) {
+        user = $scope.clients[i].name;
+        break;
+      }
+    }
+    $scope.alert.show = true;
+    $scope.alert.message = data.message;
+    $scope.alert.name = user || '未知';
   });
 });
 
@@ -282,9 +349,10 @@ app.controller('DownloadCtrl', function($scope, socket, Client) {
   socket.on('transport request', function(trans_id, filename){
     console.log('transport request');
     var t = trans_id.split('|'), user;
-    for(var i = 0, n = Client.length; i < n; i ++) {
-      if(Client[i].sid == t[0]) {
-        user = Client[i].name;
+    var clients = Client.get();
+    for(var i = 0, n = clients.length; i < n; i ++) {
+      if(clients[i].sid == t[0]) {
+        user = clients[i].name;
         break;
       }
     }
@@ -299,4 +367,14 @@ app.controller('DownloadCtrl', function($scope, socket, Client) {
       socket.emit('transport refuse', trans_id);
     }
   })
+});
+
+
+
+app.controller('DialogCtrl', function($scope) {
+  $scope.showDialog = function(name, sid) {
+  };
+
+  $scope.hideDialog = function() {
+  };
 });

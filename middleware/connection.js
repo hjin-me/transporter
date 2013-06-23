@@ -162,16 +162,6 @@ exports.manager = function (socket, all) {
       socket.emit('error', 404, 'user is disconnected');
     }
   });
-  // 请求发文件
-  socket.on('request send', function (to) {
-    var trans_id = socket.id + "|" + to + "|" + parseInt(Math.random() * 99999);
-    transport[trans_id] = {};
-    if (to in clients) {
-      clients[to].emit('request send', trans_id);
-    } else {
-      socket.emit('error', 404, 'user is disconnected');
-    }
-  });
 
   // 拒绝下载该文件
   socket.on('transport refuse', function(trans_id) {
@@ -182,5 +172,17 @@ exports.manager = function (socket, all) {
       socket.emit('error', 404, 'user is disconnected');
     }
   });
+
+  socket.on('message:send', function(data) {
+    var to = data.sid;
+    if(to in clients) {
+      clients[to].emit('message:receive', {
+        message : data.message,
+        sid : socket.id
+      });
+    } else {
+      socket.emit('err', 404, 'user is disconnected');
+    }
+  })
 };
 
