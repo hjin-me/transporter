@@ -8,7 +8,8 @@ angular.module('Tasks',[]).factory('TaskQueue', function(){
       sid : null,
       file : null,
       progress : 0,
-      status : 'ready'
+      status : 'ready',
+      xhr : null
     }
   };
   TaskQueue.prototype.push = function(task) {
@@ -47,12 +48,22 @@ app.directive('dropupload', function() {
   return {
     restrict: 'A',
     link: function (scope, elem) {
+      var ddcounter = 0
       elem.bind('dragenter', function(e){
         e.preventDefault();
+        ddcounter ++;
+        if(ddcounter > 0) {
+          e.dataTransfer.dropEffect = 'copy';
+          elem.addClass('bigger');
+        }
         return false;
       });
       elem.bind('dragleave', function(e){
         e.preventDefault();
+        ddcounter --;
+        if(ddcounter < 1) {
+          elem.removeClass('bigger');
+        }
         return false;
       });
       elem.bind('dragover', function(e){
@@ -63,6 +74,8 @@ app.directive('dropupload', function() {
         e.stopPropagation();
         e.preventDefault();
         console.log('ondrop');
+        elem.removeClass('bigger');
+        ddcounter = 0;
 
         var scope = angular.element(document.getElementById('upload')).scope();
 
@@ -137,7 +150,17 @@ app.controller('UploadCtrl', function($scope, socket, TaskQueue){
       sid : sid,
       file : file
     });
-    socket.emit('transport request', task.tid);
+    socket.emit('transport request', {tid : task.tid, filename : file.name});
+  };
+  $scope.cancelTask = function(tid) {
+    for(var i = 0, n = $scope.queues.length; i < n ;i ++) {
+      if($scope.queues[i].tid == tid) {
+        $scope.queues[i].status = 'cancel';
+        $scope.queues[i].progress = 100;
+        $scope.queues[i].xhr.abort();
+        return ;
+      }
+    }
   };
   $scope.execTask = function(trans_id) {
     var t = trans_id.split('|');
@@ -159,10 +182,11 @@ app.controller('UploadCtrl', function($scope, socket, TaskQueue){
       formdata.append("file", file);
     }
     var xhr = new XMLHttpRequest();
+    $scope.queues[i].xhr = xhr;
     // progress bar
     xhr.upload.addEventListener("progress", function(e) {
       $scope.$apply(function(){
-        var pc = parseInt(100 - (e.loaded / e.total * 100));
+        var pc = parseInt((e.loaded / e.total * 100));
         for(var i = 0, n = $scope.queues.length; i < n; i ++) {
           if($scope.queues[i].tid == tid) {
             $scope.queues[i].progress = pc;
@@ -194,7 +218,14 @@ app.controller('UploadCtrl', function($scope, socket, TaskQueue){
   socket.on('transport ready', function(trans_id) {
     console.log(trans_id);
     $scope.execTask(trans_id);
-  })
+  });
+  socket.on('transport refuse', function(trans_id) {
+    console.log(trans_id);
+    var t = trans_id.split("|");
+    var tid =  t[1] + '|' + t[2];
+    $scope.cancelTask(tid);
+    t = tid = null;
+  });
 });
 
 app.controller('InfoCtrl', function($scope, socket, User){
@@ -248,20 +279,24 @@ app.controller('DownloadCtrl', function($scope, socket, Client) {
     $scope.list.push(url);
   };
 
-  socket.on('transport request', function(tid, filename){
-    var t = tid.split('|'), user;
+  socket.on('transport request', function(trans_id, filename){
+    console.log('transport request');
+    var t = trans_id.split('|'), user;
     for(var i = 0, n = Client.length; i < n; i ++) {
       if(Client[i].sid == t[0]) {
         user = Client[i].name;
         break;
       }
     }
+    console.log(user);
     if(!user) {
       return ;
     }
     var r = confirm(user + ' 想发送[ ' + filename + ' ]给你，是否接受');
     if(r) {
-      $scope.download('/download?id=' + tid);
+      $scope.download('/download?id=' + trans_id);
+    } else {
+      socket.emit('transport refuse', trans_id);
     }
   })
 });

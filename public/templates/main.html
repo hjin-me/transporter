@@ -15,11 +15,19 @@
 <body>
 <div class="pure-g" id="container">
   <div id="info" class="pure-u">
-    <div ng-controller="InfoCtrl"><h4> {{name}} <i class="icon-edit edit" ng-click="changeName()"></i></h4></div>
+    <div ng-controller="InfoCtrl" id="personal">
+      <i class="icon-edit edit" ng-click="changeName()"></i>
+      <h4> {{name}} </h4>
+    </div>
+    <div class="divider"></div>
     <div ng-controller="UploadCtrl" id="upload">
-      <div ng-repeat="task in queues">
-        <h4>{{task.file.name}}</h4>
-        <p>{{task.status}}<i>{{task.progress}}%</i></p>
+      <div ng-repeat="task in queues" class="task">
+        <i class="icon-remove-circle" ng-show="(task.progress < 100)" ng-click="cancelTask(task.tid)"></i>
+        <h5>{{task.file.name}}</h5>
+        <div class="progress_bar">
+          <div ng-style="{width:task.progress + '%'}"></div>
+        </div>
+        <small>{{task.status}}</small>
       </div>
     </div>
   </div>

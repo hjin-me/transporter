@@ -79,7 +79,7 @@ exports.dispatcher = function () {
         }
         var download_res = transport[trans_id].write;
         download_res.setHeader('Content-type', type);
-        download_res.setHeader('Content-Disposition', "attachment;filename=" + filename);
+        download_res.setHeader('Content-Disposition', "attachment;filename=" + encodeURIComponent(filename));
 
         download_res.on('finish', function(){
           console.log('------------------ download end --------------------------');
@@ -140,12 +140,15 @@ exports.manager = function (socket, all) {
     socket.emit('user list', u);
   });
 
-  socket.on('transport request', function(tid) {
+  socket.on('transport request', function(args) {
+    console.log("transport request");
+    var tid = args.tid;
+    var filename = args.filename;
     var to = tid.split('|')[0];
     var trans_id = socket.id + "|" + tid + "|" + parseInt(Math.random() * 99999);
     transport[trans_id] = {};
     if (to in clients) {
-      clients[to].emit('transport request', trans_id);
+      clients[to].emit('transport request', trans_id, filename);
     } else {
       socket.emit('error', 404, 'user is disconnected');
     }
@@ -171,10 +174,10 @@ exports.manager = function (socket, all) {
   });
 
   // 拒绝下载该文件
-  socket.on('request refuse', function(trans_id) {
+  socket.on('transport refuse', function(trans_id) {
     var from = trans_id.split("|")[0];
     if (from in clients) {
-      clients[from].emit('request refused', trans_id);
+      clients[from].emit('transport refuse', trans_id);
     } else {
       socket.emit('error', 404, 'user is disconnected');
     }
