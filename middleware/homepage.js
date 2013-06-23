@@ -5,7 +5,6 @@
  * Time: PM9:46
  */
 module.exports = function(){
-  var tpl;
   return function homepage(req, res, next) {
     var urlParsed = require('url').parse(req.url);
     if(urlParsed.pathname != '/') {
@@ -14,19 +13,9 @@ module.exports = function(){
     }
     console.log("----- start home page ----");
 
-    var jade = require('jade');
     var fs = require('fs');
-
-    // Compile a function
-    if(!tpl) {
-      tpl = jade.compile(fs.readFileSync(__dirname + '/../views/home.jade', 'utf8'), {
-        self : true
-      });
-    }
-    res.write(tpl({
-      title : '文件上传咯'
-    }));
-    res.end();
+    var fr = fs.createReadStream(__dirname + '/../public/templates/main.html', 'utf8');
+    fr.pipe(res);
 
     console.log('ended by homepage');
   };
