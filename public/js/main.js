@@ -337,8 +337,10 @@ app.controller('ClientsCtrl', function($scope, socket, Client){
         break;
       }
     }
+    var urlPattern = /((http|ftp|https):\/\/[^ ]*)/g;
+    var message = data.message.replace(urlPattern, "<a href='$1'>$1</a>");
     $scope.alert.show = true;
-    $scope.alert.message = data.message;
+    $scope.alert.message = message;
     $scope.alert.name = user || '未知';
   });
 });
