@@ -32,7 +32,7 @@ angular.module('Tasks',[]).factory('TaskQueue', function(){
   return new TaskQueue();
 });
 
-var app = angular.module('Transporter', ['Tasks']);
+var app = angular.module('Transporter', ['Tasks', 'ngSanitize']);
 
 app.directive('client', function(){
   return {
