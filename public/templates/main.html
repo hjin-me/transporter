@@ -61,7 +61,7 @@
           <h3>消息 - 来自 {{alert.name}}</h3>
         </div>
         <div class="modal-body">
-          <pre ng-bind-html="alert.message"></pre>
+          <pre ng-bind-html="alert.message | linky"></pre>
         </div>
         <div class="modal-footer">
           <button class="pure-button" ng-click="alert.show = false">Close</button>
