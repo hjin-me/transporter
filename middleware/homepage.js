@@ -14,7 +14,7 @@ module.exports = function(){
     console.log("----- start home page ----");
 
     var fs = require('fs');
-    var fr = fs.createReadStream(__dirname + '/../public/templates/main.html', 'utf8');
+    var fr = fs.createReadStream(__dirname + '/../public/templates/main.html', { flags: 'r', encoding: 'utf8'});
     fr.pipe(res);
 
     console.log('ended by homepage');

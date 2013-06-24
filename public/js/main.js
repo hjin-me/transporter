@@ -260,10 +260,13 @@ app.controller('UploadCtrl', function($scope, socket, TaskQueue){
 });
 
 app.controller('InfoCtrl', function($scope, socket, User){
-  $scope.name = User.name;
+  $scope.user = User;
   $scope.changeName = function() {
-    $scope.name = prompt('请输入姓名', User.name || 'John');
-    User.name = $scope.name;
+    var name = prompt('请输入姓名', User.name || 'John');
+    if(!name) {
+      return ;
+    }
+    User.name = name;
     socket.emit('rename', User);
   }
 });
