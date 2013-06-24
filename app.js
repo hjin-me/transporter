@@ -5,7 +5,7 @@ var connect = require('connect'),
 
 
 /* Port which provided by BAE platform */
-var port = process.env.APP_PORT || 3000;
+var port = process.env.APP_PORT || 8100;
 
 var app = connect()
     .use(cors())
